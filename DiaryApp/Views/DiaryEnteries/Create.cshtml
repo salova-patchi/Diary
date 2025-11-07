@@ -1,0 +1,720 @@
+﻿@model DiaryApp.Models.DiaryEntry
+
+@{
+    ViewData["Title"] = "Create New Entry";
+}
+
+<style>
+    .create-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 20px;
+        padding: 50px 40px;
+        text-align: center;
+        color: white;
+        margin-bottom: 40px;
+        box-shadow: 0 20px 60px rgba(102, 126, 234, 0.3);
+        animation: fadeInDown 0.8s ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .create-header::before {
+            content: '✨';
+            position: absolute;
+            font-size: 8rem;
+            opacity: 0.1;
+            top: -20px;
+            right: -20px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .create-header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .create-header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            position: relative;
+            z-index: 1;
+        }
+
+    .form-container {
+        max-width: 900px;
+        margin: 0 auto;
+        background: white;
+        border-radius: 25px;
+        padding: 50px;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        animation: fadeInUp 1s ease-out;
+        margin-bottom: 60px;
+    }
+
+    .form-group {
+        margin-bottom: 35px;
+        animation: fadeInUp 1s ease-out;
+        animation-fill-mode: backwards;
+        position: relative;
+    }
+
+        .form-group:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+
+        .form-group:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .form-group:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        .form-group:nth-child(4) {
+            animation-delay: 0.5s;
+        }
+
+    .form-label {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 12px;
+    }
+
+        .form-label i {
+            color: #667eea;
+            font-size: 1.2rem;
+        }
+
+    .required-star {
+        color: #ff6b6b;
+        margin-left: 3px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+    }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .form-control:hover:not(:focus) {
+            border-color: #764ba2;
+        }
+
+        .form-control.is-invalid {
+            border-color: #ff6b6b !important;
+            background: #fff5f5;
+        }
+
+            .form-control.is-invalid:focus {
+                box-shadow: 0 5px 20px rgba(255, 107, 107, 0.2);
+            }
+
+    textarea.form-control {
+        min-height: 250px;
+        resize: vertical;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.8;
+    }
+
+    .char-counter {
+        text-align: right;
+        color: #999;
+        font-size: 0.9rem;
+        margin-top: 8px;
+    }
+
+    .field-validation-error {
+        color: #ff6b6b;
+        font-size: 0.9rem;
+        margin-top: 8px;
+        display: none;
+        align-items: center;
+        gap: 5px;
+        animation: shake 0.5s ease-in-out;
+    }
+
+        .field-validation-error.show {
+            display: flex;
+        }
+
+    .validation-summary-errors {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        color: white;
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        animation: slideInDown 0.5s ease-out;
+        box-shadow: 0 10px 30px rgba(255, 107, 107, 0.3);
+    }
+
+        .validation-summary-errors h4 {
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .validation-summary-errors ul {
+            margin: 0;
+            padding-left: 25px;
+            line-height: 1.8;
+        }
+
+        .validation-summary-errors li {
+            margin-bottom: 8px;
+        }
+
+    /* Mood Selection Styles */
+    .mood-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 15px;
+        margin-top: 15px;
+    }
+
+    .mood-option {
+        position: relative;
+    }
+
+        .mood-option input[type="radio"] {
+            position: absolute;
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+    .mood-label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 20px 15px;
+        background: #f8f9fa;
+        border: 2px solid #e0e0e0;
+        border-radius: 15px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+    }
+
+    .mood-emoji {
+        font-size: 2.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .mood-name {
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #666;
+        transition: color 0.3s ease;
+    }
+
+    .mood-label:hover {
+        border-color: #667eea;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.2);
+    }
+
+        .mood-label:hover .mood-emoji {
+            transform: scale(1.2) rotate(5deg);
+        }
+
+    .mood-option input[type="radio"]:checked + .mood-label {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+        transform: scale(1.05);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+        .mood-option input[type="radio"]:checked + .mood-label .mood-name {
+            color: white;
+            font-weight: 600;
+        }
+
+        .mood-option input[type="radio"]:checked + .mood-label .mood-emoji {
+            transform: scale(1.3);
+            animation: bounce 0.6s ease;
+        }
+
+    .btn-group {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 40px;
+        flex-wrap: wrap;
+    }
+
+    .btn {
+        padding: 15px 40px;
+        border: none;
+        border-radius: 50px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(-1px);
+        }
+
+    .btn-secondary {
+        background: #f8f9fa;
+        color: #666;
+        border: 2px solid #e0e0e0;
+    }
+
+        .btn-secondary:hover {
+            background: white;
+            border-color: #667eea;
+            color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+    .datetime-info {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 20px;
+        border-radius: 15px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        font-size: 1.1rem;
+        box-shadow: 0 10px 30px rgba(240, 147, 251, 0.3);
+    }
+
+        .datetime-info i {
+            font-size: 1.5rem;
+        }
+
+    .tips-box {
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        border-radius: 15px;
+        padding: 25px;
+        margin-bottom: 30px;
+        box-shadow: 0 10px 30px rgba(168, 237, 234, 0.3);
+        animation: fadeIn 1s ease-out 0.5s backwards;
+    }
+
+        .tips-box h4 {
+            color: #2d3436;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+        }
+
+        .tips-box ul {
+            margin: 0;
+            padding-left: 25px;
+            color: #2d3436;
+        }
+
+        .tips-box li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes slideInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-20px) scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes shake {
+        0%, 100% {
+            transform: translateX(0);
+        }
+
+        25% {
+            transform: translateX(-5px);
+        }
+
+        75% {
+            transform: translateX(5px);
+        }
+    }
+
+    @@keyframes float {
+        0%, 100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+
+        50% {
+            transform: translateY(-20px) rotate(5deg);
+        }
+    }
+
+    @@keyframes bounce {
+        0%, 100% {
+            transform: scale(1.3);
+        }
+
+        50% {
+            transform: scale(1.5);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .form-container {
+            padding: 30px 20px;
+        }
+
+        .create-header h1 {
+            font-size: 2rem;
+        }
+
+        .mood-grid {
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+        }
+
+        .btn-group {
+            flex-direction: column;
+        }
+
+        .btn {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+</style>
+
+<div class="create-header">
+    <h1>✍️ Create New Diary Entry</h1>
+    <p>Capture your thoughts, memories, and feelings</p>
+</div>
+
+<div class="form-container">
+    <div asp-validation-summary="ModelOnly" class="validation-summary-errors">
+        <h4>
+            <i class="fas fa-exclamation-triangle"></i>
+            Please fix the following errors:
+        </h4>
+    </div>
+
+    <div class="tips-box">
+        <h4>
+            <i class="fas fa-lightbulb"></i>
+            Writing Tips
+        </h4>
+        <ul>
+            <li>Be honest and authentic with your feelings</li>
+            <li>Include specific details to make memories vivid</li>
+            <li>Write as if you're talking to a friend</li>
+            <li>Don't worry about perfect grammar - just express yourself!</li>
+        </ul>
+    </div>
+
+    <form asp-action="Create" method="post" id="diaryForm">
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-heading"></i>
+                Entry Title
+                <span class="required-star">*</span>
+            </label>
+            <input asp-for="Title" class="form-control" placeholder="Give your entry a meaningful title..." maxlength="200" />
+            <span asp-validation-for="Title" class="field-validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-smile"></i>
+                How are you feeling?
+                <span class="required-star">*</span>
+            </label>
+            <div class="mood-grid">
+                <div class="mood-option">
+                    <input type="radio" name="Mood" value="0" id="moodHappy" />
+                    <label for="moodHappy" class="mood-label">
+                        <span class="mood-emoji">😊</span>
+                        <span class="mood-name">Happy</span>
+                    </label>
+                </div>
+                <div class="mood-option">
+                    <input type="radio" name="Mood" value="1" id="moodSad" />
+                    <label for="moodSad" class="mood-label">
+                        <span class="mood-emoji">😢</span>
+                        <span class="mood-name">Sad</span>
+                    </label>
+                </div>
+                <div class="mood-option">
+                    <input type="radio" name="Mood" value="2" id="moodExcited" />
+                    <label for="moodExcited" class="mood-label">
+                        <span class="mood-emoji">🤩</span>
+                        <span class="mood-name">Excited</span>
+                    </label>
+                </div>
+                <div class="mood-option">
+                    <input type="radio" name="Mood" value="3" id="moodCalm" />
+                    <label for="moodCalm" class="mood-label">
+                        <span class="mood-emoji">😌</span>
+                        <span class="mood-name">Calm</span>
+                    </label>
+                </div>
+                <div class="mood-option">
+                    <input type="radio" name="Mood" value="4" id="moodAnxious" />
+                    <label for="moodAnxious" class="mood-label">
+                        <span class="mood-emoji">😰</span>
+                        <span class="mood-name">Anxious</span>
+                    </label>
+                </div>
+                <div class="mood-option">
+                    <input type="radio" name="Mood" value="5" id="moodGrateful" />
+                    <label for="moodGrateful" class="mood-label">
+                        <span class="mood-emoji">🙏</span>
+                        <span class="mood-name">Grateful</span>
+                    </label>
+                </div>
+            </div>
+            <span asp-validation-for="Mood" class="field-validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-pen"></i>
+                Your Thoughts
+                <span class="required-star">*</span>
+            </label>
+            <textarea asp-for="Description" class="form-control" placeholder="What's on your mind today? Write freely..." id="descriptionField"></textarea>
+            <div class="char-counter">
+                <span id="charCount">0</span> characters
+            </div>
+            <span asp-validation-for="Description" class="field-validation-error"></span>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">
+                <i class="fas fa-calendar-alt"></i>
+                Date & Time
+            </label>
+            <div class="datetime-info">
+                <i class="fas fa-clock"></i>
+                <span id="currentDateTime"></span>
+            </div>
+            <input asp-for="Created" type="hidden" value="@DateTime.Now" />
+        </div>
+
+        <div class="btn-group">
+            <button type="submit" class="btn btn-primary">
+                <i class="fas fa-save"></i>
+                Save Entry
+            </button>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="fas fa-times"></i>
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+
+@@section Scripts {
+@{
+    await Html.RenderPartialAsync("_ValidationScriptsPartial");
+}
+
+<script>
+    // Modern validation handling - only show errors after interaction
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('diaryForm');
+        const inputs = form.querySelectorAll('input[type="text"], textarea, input[type="radio"]');
+
+        // Hide validation summary initially if no errors
+        const validationSummary = document.querySelector('.validation-summary-errors');
+        if (validationSummary && validationSummary.querySelector('ul li') === null) {
+            validationSummary.style.display = 'none';
+        }
+
+        // Handle individual field validation
+        inputs.forEach(input => {
+            let hasInteracted = false;
+
+            input.addEventListener('blur', function() {
+                hasInteracted = true;
+                validateField(this);
+            });
+
+            input.addEventListener('input', function() {
+                if (hasInteracted) {
+                    validateField(this);
+                }
+            });
+        });
+
+        function validateField(field) {
+            const errorSpan = field.parentElement.querySelector('.field-validation-error');
+
+            if (field.type === 'radio') {
+                const radioGroup = form.querySelectorAll(`input[name="${field.name}"]`);
+                const isChecked = Array.from(radioGroup).some(radio => radio.checked);
+
+                if (!isChecked && field.hasAttribute('data-val-required')) {
+                    field.parentElement.parentElement.querySelector('.field-validation-error').classList.add('show');
+                    return;
+                } else {
+                    field.parentElement.parentElement.querySelector('.field-validation-error').classList.remove('show');
+                }
+            }
+
+            if (field.value.trim() === '' && field.hasAttribute('data-val-required')) {
+                field.classList.add('is-invalid');
+                if (errorSpan) errorSpan.classList.add('show');
+            } else {
+                field.classList.remove('is-invalid');
+                if (errorSpan) errorSpan.classList.remove('show');
+            }
+        }
+
+        // Form submission validation
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            inputs.forEach(input => {
+                if (input.type === 'radio') {
+                    const radioGroup = form.querySelectorAll(`input[name="${input.name}"]`);
+                    const isChecked = Array.from(radioGroup).some(radio => radio.checked);
+                    if (!isChecked && input.hasAttribute('data-val-required')) {
+                        isValid = false;
+                        input.parentElement.parentElement.querySelector('.field-validation-error').classList.add('show');
+                    }
+                } else if (input.value.trim() === '' && input.hasAttribute('data-val-required')) {
+                    isValid = false;
+                    input.classList.add('is-invalid');
+                    const errorSpan = input.parentElement.querySelector('.field-validation-error');
+                    if (errorSpan) errorSpan.classList.add('show');
+                }
+            });
+
+            if (!isValid) {
+                e.preventDefault();
+                // Scroll to first error
+                const firstError = form.querySelector('.is-invalid, .field-validation-error.show');
+                if (firstError) {
+                    firstError.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+    });
+
+    // Character counter
+    const descField = document.getElementById('descriptionField');
+    const charCount = document.getElementById('charCount');
+
+    if (descField && charCount) {
+        descField.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+
+        // Initialize counter
+        charCount.textContent = descField.value.length;
+    }
+
+    // Display current date and time
+    function updateDateTime() {
+        const now = new Date();
+        const options = {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        };
+        const dateTimeElement = document.getElementById('currentDateTime');
+        if (dateTimeElement) {
+            dateTimeElement.textContent = now.toLocaleDateString('en-US', options);
+        }
+    }
+
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+
+    // Add smooth focus effect
+    document.querySelectorAll('.form-control').forEach(input => {
+        input.addEventListener('focus', function() {
+            this.parentElement.style.transform = 'scale(1.01)';
+        });
+
+        input.addEventListener('blur', function() {
+            this.parentElement.style.transform = 'scale(1)';
+        });
+    });
+</script>
+}

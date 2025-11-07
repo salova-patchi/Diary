@@ -1,0 +1,551 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About - DiaryApp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        /* About Page Specific Styles - Scoped to avoid conflicts */
+        .about-page {
+            animation: fadeIn 0.8s ease-out;
+            padding: 1rem 0;
+        }
+
+        /* Hero Section */
+        .about-hero {
+            text-align: center;
+            padding: 3rem 2rem 4rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            margin-bottom: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(20px);
+            position: relative;
+            overflow: hidden;
+        }
+
+            .about-hero::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 5px;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+
+        .hero-icon {
+            font-size: 4rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1.5rem;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .about-hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            letter-spacing: -1px;
+        }
+
+        .about-hero p {
+            font-size: 1.2rem;
+            color: #64748b;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+        }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2);
+            }
+
+        .stat-icon {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: #64748b;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        /* Developer Card */
+        .developer-card {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(20px);
+            margin-bottom: 2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+            .developer-card:hover {
+                transform: translateY(-10px);
+                box-shadow: 0 30px 80px rgba(102, 126, 234, 0.2);
+            }
+
+        .developer-header {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .developer-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .developer-info {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .developer-name {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .dev-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.4rem 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .developer-role {
+            font-size: 1.2rem;
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .developer-bio {
+            color: #64748b;
+            line-height: 1.8;
+            margin-bottom: 2rem;
+        }
+
+            .developer-bio p {
+                margin-bottom: 1rem;
+            }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .social-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 2px solid transparent;
+        }
+
+            .social-btn.linkedin {
+                background: #0077b5;
+                color: white;
+                box-shadow: 0 8px 25px rgba(0, 119, 181, 0.3);
+            }
+
+                .social-btn.linkedin:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 15px 40px rgba(0, 119, 181, 0.4);
+                }
+
+            .social-btn.github {
+                background: #333;
+                color: white;
+                box-shadow: 0 8px 25px rgba(51, 51, 51, 0.3);
+            }
+
+                .social-btn.github:hover {
+                    transform: translateY(-3px);
+                    box-shadow: 0 15px 40px rgba(51, 51, 51, 0.4);
+                }
+
+            .social-btn.email {
+                background: white;
+                color: #667eea;
+                border-color: #667eea;
+            }
+
+                .social-btn.email:hover {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    color: white;
+                    transform: translateY(-3px);
+                    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+                }
+
+        /* Tech Stack */
+        .tech-section {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 30px;
+            padding: 3rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+            .tech-section h2 {
+                font-size: 2rem;
+                font-weight: 800;
+                color: #1e293b;
+                margin-bottom: 2rem;
+                display: flex;
+                align-items: center;
+                gap: 1rem;
+            }
+
+                .tech-section h2 i {
+                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .tech-item {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8ecf4 100%);
+            padding: 1.5rem 1rem;
+            border-radius: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+            .tech-item:hover {
+                border-color: #667eea;
+                background: white;
+                transform: scale(1.05);
+            }
+
+            .tech-item i {
+                font-size: 2.5rem;
+                margin-bottom: 0.5rem;
+                display: block;
+            }
+
+            .tech-item.csharp i {
+                color: #239120;
+            }
+
+            .tech-item.dotnet i {
+                color: #512BD4;
+            }
+
+            .tech-item.sql i {
+                color: #CC2927;
+            }
+
+            .tech-item.html i {
+                color: #E34F26;
+            }
+
+            .tech-item.css i {
+                color: #1572B6;
+            }
+
+            .tech-item.js i {
+                color: #F7DF1E;
+            }
+
+            .tech-item span {
+                display: block;
+                font-weight: 600;
+                color: #1e293b;
+            }
+
+        /* Animations */
+        @@keyframes fadeIn {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+        @@keyframes float {
+            0%, 100%
+
+        {
+            transform: translateY(0px);
+        }
+
+        50% {
+            transform: translateY(-15px);
+        }
+
+        }
+
+        @@keyframes pulse {
+            0%, 100%
+
+        {
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.3);
+        }
+
+        50% {
+            box-shadow: 0 15px 60px rgba(102, 126, 234, 0.5);
+        }
+
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .about-hero h1
+
+        {
+            font-size: 2rem;
+        }
+
+        .about-hero p {
+            font-size: 1rem;
+        }
+
+        .developer-header {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .developer-name {
+            justify-content: center;
+        }
+
+        .social-links {
+            justify-content: center;
+        }
+
+        .developer-card {
+            padding: 2rem 1.5rem;
+        }
+
+        .tech-section {
+            padding: 2rem 1.5rem;
+        }
+
+        .about-hero {
+            padding: 2rem 1rem 3rem;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="about-page">
+        <!-- Hero Section -->
+        <div class="about-hero">
+            <div class="hero-icon">
+                <i class="fas fa-book-heart"></i>
+            </div>
+            <h1>About DiaryApp</h1>
+            <p>
+                A modern, intuitive journaling platform designed to help you capture life's moments,
+                organize your thoughts, and preserve your memories with elegance and simplicity.
+            </p>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-code"></i>
+                </div>
+                <div class="stat-number">1</div>
+                <div class="stat-label">Solo Developer</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <div class="stat-number">2025</div>
+                <div class="stat-label">Launch Year</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Made with Love</div>
+            </div>
+        </div>
+
+        <!-- Developer Card -->
+        <div class="developer-card">
+            <div class="developer-header">
+                <div class="developer-avatar">
+                    <i class="fas fa-user-astronaut"></i>
+                </div>
+                <div class="developer-info">
+                    <h2 class="developer-name">
+                        Ismail BOUREGHDA
+                        <span class="dev-badge">
+                            <i class="fas fa-star"></i>
+                            Creator & Developer
+                        </span>
+                    </h2>
+                    <div class="developer-role">Full-Stack Developer</div>
+                </div>
+            </div>
+
+            <div class="developer-bio">
+                <p>
+                    Hi! I'm Ismail, the creator and sole developer of DiaryApp. I built this platform with a passion
+                    for creating elegant, user-friendly applications that make a real difference in people's daily lives.
+                    DiaryApp is designed to be your personal sanctuary for thoughts, memories, and reflections.
+                </p>
+                <p>
+                    With expertise in modern web technologies including ASP.NET Core, C#, and SQL Server, I've crafted
+                    DiaryApp to be secure, performant, and beautiful. Every feature is thoughtfully designed to enhance
+                    your journaling experience while keeping your data safe and private.
+                </p>
+            </div>
+
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/ismail-boureghda-a3baa2292" class="social-btn linkedin" target="_blank">
+                    <i class="fab fa-linkedin-in"></i>
+                    <span>LinkedIn Profile</span>
+                </a>
+                <a href="https://github.com/salova-patchi" class="social-btn github" target="_blank">
+                    <i class="fab fa-github"></i>
+                    <span>View on GitHub</span>
+                </a>
+                <a href="mailto:ismail.boureghda2003@gmail.com" class="social-btn email">
+                    <i class="fas fa-envelope"></i>
+                    <span>Get in Touch</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Tech Stack Section -->
+        <div class="tech-section">
+            <h2>
+                <i class="fas fa-layer-group"></i>
+                Built With
+            </h2>
+            <div class="tech-grid">
+                <div class="tech-item csharp">
+                    <i class="fas fa-hashtag"></i>
+                    <span>C#</span>
+                </div>
+                <div class="tech-item dotnet">
+                    <i class="fas fa-code"></i>
+                    <span>ASP.NET Core</span>
+                </div>
+                <div class="tech-item sql">
+                    <i class="fas fa-database"></i>
+                    <span>SQL Server</span>
+                </div>
+                <div class="tech-item html">
+                    <i class="fab fa-html5"></i>
+                    <span>HTML5</span>
+                </div>
+                <div class="tech-item css">
+                    <i class="fab fa-css3-alt"></i>
+                    <span>CSS3</span>
+                </div>
+                <div class="tech-item js">
+                    <i class="fab fa-js"></i>
+                    <span>JavaScript</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Add intersection observer for fade-in animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeIn 0.8s ease-out forwards';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.stat-card, .developer-card, .tech-section').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+﻿@{
+    ViewData["Title"] = "Page Not Found";
+}
+
+<style>
+    .error-container {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 20px;
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    .error-content {
+        text-align: center;
+        max-width: 600px;
+        animation: slideUp 1s ease-out;
+    }
+
+    .error-animation {
+        position: relative;
+        margin-bottom: 40px;
+    }
+
+    .error-number {
+        font-size: 12rem;
+        font-weight: 900;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        line-height: 1;
+        margin-bottom: 20px;
+        animation: float 3s ease-in-out infinite;
+        letter-spacing: -10px;
+    }
+
+    .error-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 6rem;
+        opacity: 0.1;
+        animation: spin 20s linear infinite;
+    }
+
+    .error-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        color: #1e293b;
+        margin-bottom: 20px;
+        letter-spacing: -1px;
+    }
+
+    .error-description {
+        font-size: 1.2rem;
+        color: #64748b;
+        margin-bottom: 40px;
+        line-height: 1.7;
+    }
+
+    .error-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-home {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 40px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+        .btn-home:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+            color: white;
+        }
+
+        .btn-home i {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-home:hover i {
+            transform: translateX(-5px);
+        }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 16px 40px;
+        background: white;
+        color: #667eea;
+        text-decoration: none;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1.1rem;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        border: 2px solid #e8ecf4;
+    }
+
+        .btn-back:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+    .suggestions {
+        margin-top: 60px;
+        padding: 40px;
+        background: white;
+        border-radius: 25px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    }
+
+        .suggestions h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1e293b;
+            margin-bottom: 25px;
+        }
+
+    .suggestion-links {
+        display: grid;
+        gap: 15px;
+    }
+
+    .suggestion-link {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        padding: 20px;
+        background: #f8fafc;
+        border-radius: 15px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+
+        .suggestion-link:hover {
+            background: white;
+            border-color: #667eea;
+            transform: translateX(10px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.15);
+        }
+
+    .suggestion-icon {
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border-radius: 12px;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .suggestion-text {
+        flex: 1;
+    }
+
+    .suggestion-title {
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 5px;
+        font-size: 1.1rem;
+    }
+
+    .suggestion-desc {
+        color: #64748b;
+        font-size: 0.95rem;
+    }
+
+    .suggestion-arrow {
+        color: #667eea;
+        font-size: 1.5rem;
+        transition: transform 0.3s ease;
+    }
+
+    .suggestion-link:hover .suggestion-arrow {
+        transform: translateX(5px);
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(50px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    @@keyframes spin {
+        from {
+            transform: translate(-50%, -50%) rotate(0deg);
+        }
+
+        to {
+            transform: translate(-50%, -50%) rotate(360deg);
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .error-number {
+            font-size: 8rem;
+        }
+
+        .error-title {
+            font-size: 2rem;
+        }
+
+        .error-description {
+            font-size: 1.1rem;
+        }
+
+        .error-actions {
+            flex-direction: column;
+        }
+
+        .btn-home,
+        .btn-back {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .suggestions {
+            padding: 30px 20px;
+        }
+    }
+</style>
+
+<div class="error-container">
+    <div class="error-content">
+        <div class="error-animation">
+            <div class="error-icon">
+                <i class="fas fa-compass"></i>
+            </div>
+            <div class="error-number">404</div>
+        </div>
+
+        <h1 class="error-title">Oops! Page Not Found</h1>
+        <p class="error-description">
+            The page you're looking for seems to have wandered off. Don't worry, let's get you back on track!
+        </p>
+
+        <div class="error-actions">
+            <a href="@Url.Action("Index", "Home")" class="btn-home">
+                <i class="fas fa-home"></i>
+                <span>Go Home</span>
+            </a>
+            <a href="javascript:history.back()" class="btn-back">
+                <i class="fas fa-arrow-left"></i>
+                <span>Go Back</span>
+            </a>
+        </div>
+
+        <div class="suggestions">
+            <h3>Try These Instead:</h3>
+            <div class="suggestion-links">
+                <a href="@Url.Action("Index", "Home")" class="suggestion-link">
+                    <div class="suggestion-icon">
+                        <i class="fas fa-home"></i>
+                    </div>
+                    <div class="suggestion-text">
+                        <div class="suggestion-title">Home Page</div>
+                        <div class="suggestion-desc">Start fresh from our homepage</div>
+                    </div>
+                    <i class="fas fa-arrow-right suggestion-arrow"></i>
+                </a>
+
+                <a href="@Url.Action("Index", "DiaryEnteries")" class="suggestion-link">
+                    <div class="suggestion-icon">
+                        <i class="fas fa-book"></i>
+                    </div>
+                    <div class="suggestion-text">
+                        <div class="suggestion-title">My Diary</div>
+                        <div class="suggestion-desc">View your diary entries</div>
+                    </div>
+                    <i class="fas fa-arrow-right suggestion-arrow"></i>
+                </a>
+
+                <a href="@Url.Action("Create", "DiaryEnteries")" class="suggestion-link">
+                    <div class="suggestion-icon">
+                        <i class="fas fa-pen"></i>
+                    </div>
+                    <div class="suggestion-text">
+                        <div class="suggestion-title">Create Entry</div>
+                        <div class="suggestion-desc">Write a new diary entry</div>
+                    </div>
+                    <i class="fas fa-arrow-right suggestion-arrow"></i>
+                </a>
+
+                <a href="@Url.Action("About", "Home")" class="suggestion-link">
+                    <div class="suggestion-icon">
+                        <i class="fas fa-info-circle"></i>
+                    </div>
+                    <div class="suggestion-text">
+                        <div class="suggestion-title">About Us</div>
+                        <div class="suggestion-desc">Learn more about DiaryApp</div>
+                    </div>
+                    <i class="fas fa-arrow-right suggestion-arrow"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

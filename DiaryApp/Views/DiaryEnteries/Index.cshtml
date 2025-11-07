@@ -1,0 +1,1159 @@
+﻿@model IEnumerable<DiaryEntry>
+
+@{
+    ViewData["Title"] = "My Diary";
+    var currentPage = ViewBag.CurrentPage ?? 1;
+    var totalPages = ViewBag.TotalPages ?? 1;
+    var pageSize = ViewBag.PageSize ?? 10;
+    var totalItems = ViewBag.TotalItems ?? 0;
+    var searchTerm = ViewBag.SearchTerm ?? "";
+    var sortBy = ViewBag.SortBy ?? "date";
+    var moodFilter = ViewBag.MoodFilter ?? "all";
+}
+
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .page-wrapper {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 0 20px;
+        margin-bottom: 80px;
+    }
+
+    /* Hero Header */
+    .hero-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 30px;
+        padding: 60px 50px;
+        margin-bottom: 40px;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 30px 60px rgba(102, 126, 234, 0.3);
+        animation: slideDown 0.6s ease-out;
+    }
+
+        .hero-header::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255,255,255,0.15), transparent 70%);
+            top: -250px;
+            right: -250px;
+            animation: pulse 8s ease-in-out infinite;
+        }
+
+        .hero-header::after {
+            content: '📖';
+            position: absolute;
+            font-size: 15rem;
+            opacity: 0.05;
+            bottom: -50px;
+            left: -50px;
+            transform: rotate(-15deg);
+        }
+
+    .hero-content {
+        position: relative;
+        z-index: 1;
+        color: white;
+        text-align: center;
+    }
+
+    .hero-title {
+        font-size: 3.5rem;
+        font-weight: 800;
+        margin-bottom: 15px;
+        letter-spacing: -1px;
+    }
+
+    .hero-subtitle {
+        font-size: 1.3rem;
+        opacity: 0.95;
+        margin-bottom: 30px;
+    }
+
+    /* Stats Dashboard */
+    .stats-dashboard {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 20px;
+        margin-bottom: 40px;
+        animation: fadeIn 0.8s ease-out 0.2s backwards;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+    }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.4s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 20px 50px rgba(102, 126, 234, 0.25);
+        }
+
+            .stat-card:hover::before {
+                transform: scaleX(1);
+            }
+
+    .stat-icon {
+        font-size: 2.5rem;
+        margin-bottom: 15px;
+        display: inline-block;
+        animation: bounce 2s infinite;
+    }
+
+    .stat-number {
+        font-size: 2.5rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        margin-bottom: 8px;
+    }
+
+    .stat-label {
+        color: #666;
+        font-size: 0.95rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Control Panel */
+    .control-panel {
+        background: white;
+        padding: 35px;
+        border-radius: 25px;
+        margin-bottom: 40px;
+        box-shadow: 0 15px 50px rgba(0,0,0,0.08);
+        animation: fadeIn 1s ease-out 0.4s backwards;
+    }
+
+    .control-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .control-title {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .search-container {
+        position: relative;
+        flex: 1;
+        max-width: 500px;
+        min-width: 250px;
+    }
+
+    .search-input {
+        width: 100%;
+        padding: 15px 50px 15px 50px;
+        border: 3px solid #e8e8e8;
+        border-radius: 50px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fc;
+    }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.15);
+            transform: translateY(-2px);
+        }
+
+    .search-icon {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #667eea;
+        font-size: 1.2rem;
+    }
+
+    .search-clear {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: #ff6b6b;
+        color: white;
+        border: none;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+
+        .search-clear:hover {
+            transform: translateY(-50%) scale(1.1);
+        }
+
+    .btn-new-entry {
+        padding: 15px 35px;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 1rem;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+    }
+
+        .btn-new-entry:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.5);
+        }
+
+    .filters-row {
+        display: flex;
+        gap: 15px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: #f8f9fc;
+        padding: 12px 20px;
+        border-radius: 50px;
+        border: 2px solid #e8e8e8;
+        transition: all 0.3s ease;
+    }
+
+        .filter-group:hover {
+            border-color: #667eea;
+            background: white;
+        }
+
+    .filter-label {
+        font-weight: 600;
+        color: #667eea;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .filter-select {
+        border: none;
+        background: none;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #333;
+        cursor: pointer;
+        outline: none;
+        padding: 5px;
+    }
+
+    .active-filters {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-top: 15px;
+    }
+
+    .filter-tag {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 8px 18px;
+        border-radius: 50px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        animation: slideIn 0.3s ease;
+    }
+
+        .filter-tag i {
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+            .filter-tag i:hover {
+                transform: scale(1.3);
+            }
+
+    /* Entries Grid */
+    .entries-container {
+        animation: fadeIn 1.2s ease-out 0.6s backwards;
+    }
+
+    .view-toggle {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 25px;
+        justify-content: flex-end;
+    }
+
+    .view-btn {
+        padding: 10px 20px;
+        background: white;
+        border: 2px solid #e8e8e8;
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        color: #666;
+        font-weight: 600;
+    }
+
+        .view-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+        }
+
+    .entries-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        gap: 30px;
+        margin-bottom: 50px;
+    }
+
+    .entries-list {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        margin-bottom: 50px;
+    }
+
+    .entry-card {
+        background: white;
+        border-radius: 25px;
+        padding: 35px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.5s ease-out backwards;
+        cursor: pointer;
+    }
+
+        .entry-card::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 6px;
+            background: linear-gradient(180deg, #667eea, #764ba2);
+            transform: scaleY(0);
+            transition: transform 0.4s ease;
+        }
+
+        .entry-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 60px rgba(102, 126, 234, 0.25);
+        }
+
+            .entry-card:hover::before {
+                transform: scaleY(1);
+            }
+
+        .entry-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .entry-card:nth-child(2) {
+            animation-delay: 0.15s;
+        }
+
+        .entry-card:nth-child(3) {
+            animation-delay: 0.2s;
+        }
+
+        .entry-card:nth-child(4) {
+            animation-delay: 0.25s;
+        }
+
+        .entry-card:nth-child(5) {
+            animation-delay: 0.3s;
+        }
+
+    .entry-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 20px;
+        gap: 20px;
+    }
+
+    .entry-date-badge {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        padding: 18px;
+        border-radius: 18px;
+        text-align: center;
+        min-width: 85px;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.35);
+    }
+
+    .date-day {
+        font-size: 2.2rem;
+        font-weight: 800;
+        line-height: 1;
+        display: block;
+    }
+
+    .date-month {
+        font-size: 0.85rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        opacity: 0.9;
+        letter-spacing: 1px;
+    }
+
+    .entry-info {
+        flex: 1;
+    }
+
+    .entry-title {
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 10px;
+        line-height: 1.3;
+    }
+
+    .entry-meta {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        color: #999;
+        font-size: 0.9rem;
+        flex-wrap: wrap;
+    }
+
+    .meta-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .mood-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        color: white;
+        padding: 6px 16px;
+        border-radius: 50px;
+        font-weight: 600;
+        font-size: 0.85rem;
+    }
+
+    .mood-emoji {
+        font-size: 1.2rem;
+    }
+
+    .entry-preview {
+        color: #666;
+        line-height: 1.8;
+        margin-bottom: 20px;
+        font-size: 1.05rem;
+    }
+
+    .entry-actions {
+        display: flex;
+        gap: 10px;
+        padding-top: 20px;
+        border-top: 2px solid #f5f5f5;
+    }
+
+    .action-btn {
+        flex: 1;
+        padding: 12px;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+
+    .btn-view {
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+    }
+
+        .btn-view:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+    .btn-edit {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+        color: white;
+    }
+
+        .btn-edit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(240, 147, 251, 0.4);
+        }
+
+    .btn-delete {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+        color: white;
+    }
+
+        .btn-delete:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.4);
+        }
+
+    /* Pagination */
+    .pagination-wrapper {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        padding: 30px 40px;
+        border-radius: 25px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        margin-bottom: 50px;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .pagination-info {
+        font-size: 1rem;
+        color: #666;
+        font-weight: 600;
+    }
+
+    .pagination-controls {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    .page-btn {
+        width: 45px;
+        height: 45px;
+        border-radius: 12px;
+        border: 2px solid #e8e8e8;
+        background: white;
+        color: #667eea;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+    }
+
+        .page-btn:hover:not(.disabled):not(.active) {
+            background: #f8f9fc;
+            border-color: #667eea;
+            transform: translateY(-2px);
+        }
+
+        .page-btn.active {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.1);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .page-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+    .page-ellipsis {
+        width: 45px;
+        text-align: center;
+        color: #999;
+        font-weight: 700;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 100px 40px;
+        background: white;
+        border-radius: 25px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+    }
+
+    .empty-icon {
+        font-size: 8rem;
+        margin-bottom: 30px;
+        opacity: 0.2;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .empty-title {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    .empty-text {
+        font-size: 1.1rem;
+        color: #999;
+        margin-bottom: 30px;
+    }
+
+    /* Animations */
+    @@keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes slideIn {
+        from {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    @@keyframes pulse {
+        0%, 100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.05);
+        }
+    }
+
+    @@keyframes bounce {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-10px);
+        }
+    }
+
+    @@keyframes float {
+        0%, 100% {
+            transform: translateY(0);
+        }
+
+        50% {
+            transform: translateY(-20px);
+        }
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .hero-title {
+            font-size: 2.2rem;
+        }
+
+        .entries-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .control-header {
+            flex-direction: column;
+        }
+
+        .search-container {
+            max-width: 100%;
+        }
+
+        .filters-row {
+            flex-direction: column;
+            width: 100%;
+        }
+
+        .filter-group {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .pagination-wrapper {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .stats-dashboard {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+</style>
+
+<div class="page-wrapper">
+    <!-- Hero Header -->
+    <div class="hero-header">
+        <div class="hero-content">
+            <h1 class="hero-title">📖 My Diary Journey</h1>
+            <p class="hero-subtitle">Your personal space for thoughts, memories, and growth</p>
+        </div>
+    </div>
+
+    <!-- Stats Dashboard -->
+    <div class="stats-dashboard">
+        <div class="stat-card">
+            <div class="stat-icon">📝</div>
+            <div class="stat-number">@totalItems</div>
+            <div class="stat-label">Total Entries</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-number">@DateTime.Now.ToString("MMM")</div>
+            <div class="stat-label">This Month</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">📊</div>
+            <div class="stat-number">@totalPages</div>
+            <div class="stat-label">Pages</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-number">@Model.Count()</div>
+            <div class="stat-label">Showing Now</div>
+        </div>
+    </div>
+
+    <!-- Control Panel -->
+    <div class="control-panel">
+        <div class="control-header">
+            <h2 class="control-title">
+                <i class="fas fa-filter"></i>
+                Filter & Search
+            </h2>
+            <a href="@Url.Action("Create", "DiaryEnteries")" class="btn-new-entry">
+                <i class="fas fa-plus-circle"></i>
+                New Entry
+            </a>
+        </div>
+
+        <div class="search-container">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text"
+                   class="search-input"
+                   id="searchInput"
+                   placeholder="Search entries by title or content..."
+                   value="@searchTerm">
+            <button class="search-clear" id="clearSearch">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+
+        <div class="filters-row" style="margin-top: 20px;">
+            <div class="filter-group">
+                <span class="filter-label">
+                    <i class="fas fa-sort"></i>
+                    Sort:
+                </span>
+                <select class="filter-select" id="sortSelect">
+                    <option value="date" selected="@(sortBy == "date")">Latest First</option>
+                    <option value="date_asc" selected="@(sortBy == "date_asc")">Oldest First</option>
+                    <option value="title" selected="@(sortBy == "title")">Title A-Z</option>
+                    <option value="title_desc" selected="@(sortBy == "title_desc")">Title Z-A</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <span class="filter-label">
+                    <i class="fas fa-smile"></i>
+                    Mood:
+                </span>
+                <select class="filter-select" id="moodSelect">
+                    <option value="all" selected="@(moodFilter == "all")">All Moods</option>
+                    <option value="0" selected="@(moodFilter == "0")">😊 Happy</option>
+                    <option value="1" selected="@(moodFilter == "1")">😢 Sad</option>
+                    <option value="2" selected="@(moodFilter == "2")">🤩 Excited</option>
+                    <option value="3" selected="@(moodFilter == "3")">😌 Calm</option>
+                    <option value="4" selected="@(moodFilter == "4")">😰 Anxious</option>
+                    <option value="5" selected="@(moodFilter == "5")">🙏 Grateful</option>
+                </select>
+            </div>
+
+            @if (!string.IsNullOrEmpty(searchTerm) || moodFilter != "all" || sortBy != "date")
+            {
+                <a href="@Url.Action("Index")" class="filter-group" style="cursor: pointer; border-color: #ff6b6b;">
+                    <i class="fas fa-redo" style="color: #ff6b6b;"></i>
+                    <span style="color: #ff6b6b; font-weight: 600;">Reset All</span>
+                </a>
+            }
+        </div>
+
+        @if (!string.IsNullOrEmpty(searchTerm) || moodFilter != "all")
+        {
+            <div class="active-filters">
+                @if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    <span class="filter-tag">
+                        🔍 "@searchTerm"
+                        <i class="fas fa-times" onclick="clearFilter('search')"></i>
+                    </span>
+                }
+                @if (moodFilter != "all")
+                {
+                    var moodName = moodFilter switch
+                    {
+                        "0" => "😊 Happy",
+                        "1" => "😢 Sad",
+                        "2" => "🤩 Excited",
+                        "3" => "😌 Calm",
+                        "4" => "😰 Anxious",
+                        "5" => "🙏 Grateful",
+                        _ => ""
+                    };
+                    <span class="filter-tag">
+                        @moodName
+                        <i class="fas fa-times" onclick="clearFilter('mood')"></i>
+                    </span>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- Entries -->
+    <div class="entries-container">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="empty-state">
+                <div class="empty-icon">📖</div>
+                @if (!string.IsNullOrEmpty(searchTerm) || moodFilter != "all")
+                {
+                    <h2 class="empty-title">No Entries Found</h2>
+                    <p class="empty-text">Try adjusting your filters or search terms</p>
+                    <a href="@Url.Action("Index")" class="btn-new-entry">
+                        <i class="fas fa-redo"></i>
+                        Clear Filters
+                    </a>
+                }
+                else
+                {
+                    <h2 class="empty-title">Start Your Journey</h2>
+                    <p class="empty-text">No diary entries yet. Create your first one!</p>
+                    <a href="@Url.Action("Create", "DiaryEnteries")" class="btn-new-entry">
+                        <i class="fas fa-pen"></i>
+                        Write First Entry
+                    </a>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="entries-grid">
+                @foreach (var entry in Model)
+                {
+                    var moodEmoji = entry.Mood switch
+                    {
+                        DiaryApp.Models.Mood.Happy => "😊",
+                        DiaryApp.Models.Mood.Sad => "😢",
+                        DiaryApp.Models.Mood.Excited => "🤩",
+                        DiaryApp.Models.Mood.Calm => "😌",
+                        DiaryApp.Models.Mood.Anxious => "😰",
+                        DiaryApp.Models.Mood.Grateful => "🙏",
+                        _ => "😊"
+                    };
+
+                    <div class="entry-card" onclick="window.location='@Url.Action("Details", "DiaryEnteries", new { id = entry.Id })'">
+                        <div class="entry-top">
+                            <div class="entry-date-badge">
+                                <span class="date-day">@entry.Created.Day</span>
+                                <span class="date-month">@entry.Created.ToString("MMM")</span>
+                            </div>
+                            <div class="entry-info">
+                                <h3 class="entry-title">@entry.Title</h3>
+                                <div class="entry-meta">
+                                    <span class="meta-item">
+                                        <i class="fas fa-clock"></i>
+                                        @entry.Created.ToString("hh:mm tt")
+                                    </span>
+                                    <span class="mood-badge">
+                                        <span class="mood-emoji">@moodEmoji</span>
+                                        @entry.Mood.ToString()
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="entry-preview">
+                            @(entry.Description?.Length > 180 ? entry.Description.Substring(0, 180) + "..." : entry.Description)
+                        </div>
+
+                        <div class="entry-actions" onclick="event.stopPropagation();">
+                            <a href="@Url.Action("Details", "DiaryEnteries", new { id = entry.Id })" class="action-btn btn-view">
+                                <i class="fas fa-eye"></i>
+                                View
+                            </a>
+                            <a href="@Url.Action("Edit", "DiaryEnteries", new { id = entry.Id })" class="action-btn btn-edit">
+                                <i class="fas fa-edit"></i>
+                                Edit
+                            </a>
+                            <a href="@Url.Action("Delete", "DiaryEnteries", new { id = entry.Id })"
+                               class="action-btn btn-delete"
+              >
+                                <i class="fas fa-trash-alt"></i>
+                                Delete
+                            </a>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Pagination -->
+            @if (totalPages > 1)
+            {
+                <div class="pagination-wrapper">
+                    <div class="pagination-info">
+                        Showing <strong>@((currentPage - 1) * pageSize + 1)</strong> to <strong>@Math.Min(currentPage * pageSize, totalItems)</strong> of <strong>@totalItems</strong> entries
+                    </div>
+
+                    <div class="pagination-controls">
+                        <a href="javascript:void(0)"
+                           class="page-btn @(currentPage == 1 ? "disabled" : "")"
+                           onclick="@(currentPage == 1 ? "return false;" : $"navigateToPage({currentPage - 1})")">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+
+                        @for (int i = 1; i <= totalPages; i++)
+                        {
+                            if (i == 1 || i == totalPages || (i >= currentPage - 2 && i <= currentPage + 2))
+                            {
+                                <a href="javascript:void(0)"
+                                   class="page-btn @(i == currentPage ? "active" : "")"
+                                   onclick="navigateToPage(@i)">
+                                    @i
+                                </a>
+                            }
+                            else if (i == currentPage - 3 || i == currentPage + 3)
+                            {
+                                <span class="page-ellipsis">...</span>
+                            }
+                        }
+
+                        <a href="javascript:void(0)"
+                           class="page-btn @(currentPage == totalPages ? "disabled" : "")"
+                           onclick="@(currentPage == totalPages ? "return false;" : $"navigateToPage({currentPage + 1})")">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
+
+<script>
+    // Global state
+    let currentFilters = {
+        search: '@searchTerm',
+        sortBy: '@sortBy',
+        mood: '@moodFilter'
+    };
+
+    // Navigate to page with current filters
+    function navigateToPage(page) {
+        const url = new URL(window.location.href);
+        url.searchParams.set('page', page);
+        if (currentFilters.search) url.searchParams.set('search', currentFilters.search);
+        if (currentFilters.sortBy) url.searchParams.set('sortBy', currentFilters.sortBy);
+        if (currentFilters.mood && currentFilters.mood !== 'all') url.searchParams.set('mood', currentFilters.mood);
+        window.location.href = url.toString();
+    }
+
+    // Apply filters
+    function applyFilters() {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('page'); // Reset to page 1
+
+        if (currentFilters.search) {
+            url.searchParams.set('search', currentFilters.search);
+        } else {
+            url.searchParams.delete('search');
+        }
+
+        if (currentFilters.sortBy) {
+            url.searchParams.set('sortBy', currentFilters.sortBy);
+        }
+
+        if (currentFilters.mood && currentFilters.mood !== 'all') {
+            url.searchParams.set('mood', currentFilters.mood);
+        } else {
+            url.searchParams.delete('mood');
+        }
+
+        window.location.href = url.toString();
+    }
+
+    // Clear specific filter
+    function clearFilter(filterType) {
+        if (filterType === 'search') {
+            currentFilters.search = '';
+            document.getElementById('searchInput').value = '';
+        } else if (filterType === 'mood') {
+            currentFilters.mood = 'all';
+            document.getElementById('moodSelect').value = 'all';
+        }
+        applyFilters();
+    }
+
+    // Search functionality with debounce
+    let searchTimeout;
+    const searchInput = document.getElementById('searchInput');
+    const clearSearch = document.getElementById('clearSearch');
+
+    if (searchInput) {
+        // Show/hide clear button
+        function toggleClearButton() {
+            if (searchInput.value) {
+                clearSearch.style.display = 'flex';
+            } else {
+                clearSearch.style.display = 'none';
+            }
+        }
+
+        toggleClearButton();
+
+        searchInput.addEventListener('input', function() {
+            toggleClearButton();
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentFilters.search = this.value.trim();
+                applyFilters();
+            }, 800);
+        });
+
+        clearSearch.addEventListener('click', function() {
+            searchInput.value = '';
+            currentFilters.search = '';
+            toggleClearButton();
+            applyFilters();
+        });
+    }
+
+    // Sort select
+    const sortSelect = document.getElementById('sortSelect');
+    if (sortSelect) {
+        sortSelect.addEventListener('change', function() {
+            currentFilters.sortBy = this.value;
+            applyFilters();
+        });
+    }
+
+    // Mood select
+    const moodSelect = document.getElementById('moodSelect');
+    if (moodSelect) {
+        moodSelect.addEventListener('change', function() {
+            currentFilters.mood = this.value;
+            applyFilters();
+        });
+    }
+
+    // Keyboard shortcuts
+    document.addEventListener('keydown', function(e) {
+        // Ctrl/Cmd + K to focus search
+        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+            e.preventDefault();
+            searchInput?.focus();
+        }
+
+        // Ctrl/Cmd + N to create new entry
+        if ((e.ctrlKey || e.metaKey) && e.key === 'n') {
+            e.preventDefault();
+            window.location.href = '@Url.Action("Create", "DiaryEnteries")';
+        }
+    });
+
+    // Add loading state
+    const entriesGrid = document.querySelector('.entries-grid');
+    if (entriesGrid) {
+        // Smooth scroll to top on page change
+        window.addEventListener('load', function() {
+            if (window.location.search.includes('page=')) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+    }
+</script>
