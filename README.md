@@ -20,7 +20,7 @@ http://diaryentries.runasp.net/DiaryEnteries
 
 ## 🛠️ Tech Stack
 
-- **Framework**: ASP.NET Core 8.0 MVC
+- **Framework**: ASP.NET Core 9.0 MVC
 - **Database**: SQL Server with Entity Framework Core
 - **Frontend**: 
   - HTML5, CSS3, JavaScript
