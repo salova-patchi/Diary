@@ -189,9 +189,6 @@ To disable automatic cleanup, set `Enabled` to `false`.
 - [ ] Mood analytics dashboard
 - [ ] Email notifications
 
-## 📝 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 🤝 Contributing
 
